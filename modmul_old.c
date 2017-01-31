@@ -13,37 +13,17 @@ void stage1() {
 
   mpz_t N, e, m, c;
   mpz_inits( N, e, m, c, NULL);
-  // Montgomery parameters
-  mpz_t rho_sq;
-  mpz_init(rho_sq);
-  mp_limb_t omega;
   
   while (!feof(stdin)){
     mpz_inp_str(N,stdin,16);
     mpz_inp_str(e,stdin,16);
     mpz_inp_str(m,stdin,16);
 
-    // Iteration 1
+    // Requires N to be odd.
     // mpz_powm_sec(c,m,e,N);
 
-    // Iteration 2
-    // modular_exponentiation(c,m,e,N);
-    
-    // Iteration 3
-    // initialise Montgomery parameters
-    montgomery_omega(&omega, N);
-    montgomery_rho_sq(rho_sq, N);
-    
-    // convert m to a Montgomery number
-    montgomery_number(m, m, rho_sq, omega, N);
-    
-    // Enc: c = m^e mod N
-    window_exp(c, m, e, rho_sq, omega, N);
-    
-    // perform Montgomery reduction on c
-    montgomery_reduction(c, c, omega, N);
-    
-
+    modular_exponentiation(c,m,e,N);
+        
     gmp_printf( "%ZX\n", c);
   }
 
