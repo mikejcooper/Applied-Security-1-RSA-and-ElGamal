@@ -48,7 +48,7 @@ void prng(mpz_t rand_Num, mpz_t q) {
     //  Create random state - Mersenne Twister algorithm. 
     gmp_randinit_default (r_state);
     // Create seed using randomness from /dev/urandom
-	mpz_set(seed, prng_values[get_prng()]);
+	mpz_swap(seed, prng_values[get_prng()]);
     // Random state seeding 
     gmp_randseed(r_state, seed);
 	// Generate a uniform random integer in the range 0 to q-1, inclusive - 

@@ -10,50 +10,45 @@ int max(int x, int y) {
 
 /*
     Montgomery multiplication
+    r = a.b mod N
 */
-void montgomery_multiplication(mpz_t rop, mpz_t x, mpz_t y, mp_limb_t omega, mpz_t N) {
-    
-    // work with a temp var instead of rop, so that the same variable can be passed as x and rop (similarly to native GMP functions)
-    mpz_t r;
-    mpz_init(r);
-    
-    // r <- 0
-    mpz_set_ui(r, 0);
-    mp_limb_t u, y_i, x_0, r_0;
+void mont_multiplication(mpz_t r, mpz_t a, mpz_t b, mp_limb_t omega, mpz_t N) {
+    mp_limb_t u, b_i, a_0, t_0;
+    mpz_t t;
+    mpz_init(t);
+    mpz_set_ui(t, 0);
     
     // l_N - mpz_size(N)
     for (mp_size_t i = 0; i < mpz_size(N); i++) {
         
-        // u <- (r_0 + y_i*x_0)*omega (mod b)
-        y_i = mpz_getlimbn(y, i); // i-th limb of y
-        x_0 = mpz_getlimbn(x, 0); // 0-th limb of x
-        r_0 = mpz_getlimbn(r, 0); // 0-th limb of r
-        u = (r_0 + y_i * x_0) * omega;
+        // u = (t_0 + b_i.a_0).omega (mod b)
+        b_i = mpz_getlimbn(b, i); // i-th limb b
+        a_0 = mpz_getlimbn(a, 0); // 0-th limb a
+        t_0 = mpz_getlimbn(t, 0); // 0-th limb t
+        u = (t_0 + b_i * a_0) * omega;
         
-        // r <- (r + y_i*x + u*N)/b
-        mpz_addmul_ui(r, x, y_i); // r <- r + y_i*x
-        mpz_addmul_ui(r, N, u);   // r <- r + u*N
-        mpz_tdiv_q_2exp(r, r, mp_bits_per_limb);  // r <- r/b
+        // t = (t + b_i.a + u.N) / b
+        mpz_addmul_ui(t, a, b_i); // t = t + b_i.a
+        mpz_addmul_ui(t, N, u);   // t = t + u.N
+        mpz_tdiv_q_2exp(t, t, mp_bits_per_limb);  // t = t / b
     }
     
-    // if r > N, r <- r - N
-    if(mpz_cmp(r,N) >= 0)
-        mpz_sub(r,r,N);
+    // if (t > N) then t = t - N
+    if(mpz_cmp(t,N) >= 0)
+        mpz_sub(t,t,N);
     
-    mpz_swap(rop, r); // mpz_swap is O(1), while mpz_set is O(n) where n is the number of limbs
-    
-    // clear temp var
-    mpz_clear(r);
+    mpz_swap(r, t);
+    mpz_clear(t);
 }
 
 /*****************************
-    Montgomery preprocessing
+    mont preprocessing
 ******************************/
 
 /*
     Computing omega
 */
-void montgomery_omega(mp_limb_t* omega, mpz_t N) {
+void mont_omega(mp_limb_t* omega, mpz_t N) {
     // omega <- 1 (mod b)
     *omega = 1;
     
@@ -71,7 +66,7 @@ void montgomery_omega(mp_limb_t* omega, mpz_t N) {
 /*
     Computing rho^2
 */
-void montgomery_rho_sq(mpz_t rho_sq, mpz_t N) {
+void mont_rho_sq(mpz_t rho_sq, mpz_t N) {
     // rho_sq <- 1 (mod N)
     mpz_set_ui(rho_sq, 1);
     
@@ -88,18 +83,18 @@ void montgomery_rho_sq(mpz_t rho_sq, mpz_t N) {
 }
 
 /*
-    Convert a number into a montgomery number
+    Convert a number into a mont number
         num should be < N
 */
-void montgomery_number(mpz_t rop, mpz_t num, mpz_t rho_sq, mp_limb_t omega, mpz_t N) {
+void mont_number(mpz_t rop, mpz_t num, mpz_t rho_sq, mp_limb_t omega, mpz_t N) {
     // r <- mont_num = num * rho (mod N)
-    montgomery_multiplication(rop, num, rho_sq, omega, N);
+    mont_multiplication(rop, num, rho_sq, omega, N);
 }
 
 /*
-    Montgomery reduction
+    mont reduction
 */
-void montgomery_reduction(mpz_t rop, mpz_t t, mp_limb_t omega, mpz_t N) {
+void mont_reduction(mpz_t rop, mpz_t t, mp_limb_t omega, mpz_t N) {
     mpz_t r;
     mpz_init(r);
     
@@ -197,17 +192,17 @@ void window_exp(mpz_t rop, mpz_t base, mpz_t exp, mpz_t rho_sq, mp_limb_t omega,
     mpz_init(base_squared);
     
     // compute base^2 
-    montgomery_multiplication(base_squared, base, base, omega, mod);
+    mont_multiplication(base_squared, base, base, omega, mod);
     
     // precompute look-up table
     for(int i = 1; i < m/2; i++) {
         mpz_init(table[i]);
-        montgomery_multiplication(table[i], table[i-1], base_squared, omega, mod);
+        mont_multiplication(table[i], table[i-1], base_squared, omega, mod);
     }
     ////////////////////////////////////
     
     mpz_set_ui(rop,1);
-    montgomery_number(rop, rop, rho_sq, omega, mod);
+    mont_number(rop, rop, rho_sq, omega, mod);
     
     // the number of bits
     int bits_number = mpz_size(exp) * mp_bits_per_limb;
@@ -220,7 +215,7 @@ void window_exp(mpz_t rop, mpz_t base, mpz_t exp, mpz_t rho_sq, mp_limb_t omega,
         // traverse through leading zeros
         if(return_bits(exp, i, i) == 0) {
             i--;
-            montgomery_multiplication(rop, rop, rop, omega, mod);
+            mont_multiplication(rop, rop, rop, omega, mod);
             continue;
         }
         
@@ -236,12 +231,12 @@ void window_exp(mpz_t rop, mpz_t base, mpz_t exp, mpz_t rho_sq, mp_limb_t omega,
         
         // line 11 (squaring t) - place adjustment
         for(int j = 0; j < i - l + 1; j++) {
-            montgomery_multiplication(rop, rop, rop, omega, mod);
+            mont_multiplication(rop, rop, rop, omega, mod);
         }
         
         // table lookup
         // t <- t * T[(u-1)/2]
-        montgomery_multiplication(rop, rop, table[(u - 1) / 2], omega, mod);
+        mont_multiplication(rop, rop, table[(u - 1) / 2], omega, mod);
         
         // update i
         i = l - 1;   
