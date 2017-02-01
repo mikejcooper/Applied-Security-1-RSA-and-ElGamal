@@ -103,7 +103,7 @@ void stage2() {
     // If mQ - mP is neg, convert to positive modulo
     mpz_mod(t, t, q);
     
-    // convert t and iP to Montgomery numbers
+    // Convert t and iP to Montgomery numbers
     mont_number(t, t, r_sq, omega, q);
     mont_number(iP, iP, r_sq, omega, q);
     
@@ -138,7 +138,7 @@ void stage3(int is_prng) {
   mpz_t p, q, g, h, m, c1, c2, key;
   mpz_inits(  p, q, g, h, m, c1, c2, key, NULL);
   
-  // mont parameters
+  // Montgomery parameters
   mpz_t r_sq;
   mpz_init(r_sq);
   mp_limb_t omega;
@@ -152,6 +152,7 @@ void stage3(int is_prng) {
     else {
       mpz_set_ui (key, 1);
     }
+    
     // Iteration 1
     // mpz_powm_sec(c1,g,key,p);
     // mpz_powm_sec(c2,h,key,p);
@@ -219,6 +220,7 @@ void stage4() {
 
   while (!feof(stdin)){
     gmp_scanf("%Zx%Zx%Zx%Zx%Zx%Zx", p, q, g, x, c1, c2);
+    
     // Iteration 1
     // mpz_powm_sec(c1,c1,x,p);
     // mpz_invert (c1, c1, p);
@@ -266,9 +268,6 @@ the correct function for the requested stage.
 
 int main( int argc, char* argv[] ) {
   fill_prng_array();
-  // if( 2 != argc ) {
-  //   abort();
-  // }
 
   if     ( !strcmp( argv[ 1 ], "stage1" ) ) {
     stage1();
@@ -276,7 +275,7 @@ int main( int argc, char* argv[] ) {
   else if( !strcmp( argv[ 1 ], "stage2" ) ) {
     stage2();
   }
-  else if( !strcmp( argv[ 1 ], "stage3a" )) {
+  else if( !strcmp( argv[ 1 ], "PRNGstage3" )) {
     stage3(1);
   }
   else if( !strcmp( argv[ 1 ], "stage3" ) ) {
@@ -285,14 +284,10 @@ int main( int argc, char* argv[] ) {
   else if( !strcmp( argv[ 1 ], "stage4" ) ) {
     stage4();
   }
-
-
   else if( !strcmp( argv[ 1 ], "test" ) ) {
     gmp_printf( "Testing on %s ....\n", argv[2]);
     test(strcat(argv[2],".output"), "playground.output");
   }
-
-
   else {
     abort();
   }

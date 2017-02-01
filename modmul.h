@@ -9,13 +9,10 @@
 
 
 void test(char* file1, char* file2);
-void stage1();
 
 void prng(mpz_t rand_Num, mpz_t q);
-
 void fill_prng_array();
 void clear_prng_array();
-
 
 void crt(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t ip, mpz_t iq, mpz_t c, mpz_t m);
 

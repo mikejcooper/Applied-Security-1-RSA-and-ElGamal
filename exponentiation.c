@@ -1,6 +1,7 @@
 #include "modmul.h"
 #include <math.h>
-#define WINDOW_SIZE 4   // Sliding Window Exponentiation
+#define WINDOW_SIZE 4   // Window size of 4 is most efficent on given input data
+
 
 /* 
 

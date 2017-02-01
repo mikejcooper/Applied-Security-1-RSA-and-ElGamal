@@ -1,0 +1,25 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf760
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 HelveticaNeue-Bold;}
+{\colortbl;\red255\green255\blue255;\red53\green53\blue53;}
+{\*\expandedcolortbl;;\cssrgb\c27059\c27059\c27059;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs24 \cf2 Stage 1-4: \
+\pard\pardeftab560\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf2 {\listtext	\uc0\u8259 	}All tests pass on input format provided in assignment documentation. \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf2 \
+Optomisation: \
+a) To generate the ephemeral key, I used the gmp 
+\f1\b gmp_randinit_default 
+\f0\b0 function which creates an initial state for the Mersenne Twister algorithm. I then generate a 160-bit random seed (SHA1 equivalent), the size of the seed is important as it determines how many different sequences of random numbers that it\'92s possible to generate (2^160). To do this I read bytes of information from the \'91/dev/urandom\'92 directory - this appears to be one of the only way to obtain a approximate representation of randomness (pseudo-random generation).  \
+I store an array of 160 bit random values, which can potentially be more efficient (less reading from  \'91/dev/urandom\'92 directory) if many messages need encoding before exiting the program.  \
+\
+To run stage 3 with the PRNG run: \'93bash$ ./modmul PRNGstage3 < $\{INPUT\} > $\{OUTPUT\}\'94\
+\
+I use mpz_swap where possible as it is O(1), while mpz_set is O(n) where n is the number of limbs.\
+}
