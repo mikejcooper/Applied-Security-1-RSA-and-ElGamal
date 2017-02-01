@@ -18,15 +18,16 @@ void clear_prng_array();
 
 
 void crt(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t ip, mpz_t iq, mpz_t c, mpz_t m);
-void crt_special_case(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t ip, mpz_t iq, mpz_t c, mpz_t m);
-
-// void sub_gmp(mpz_t a, double b);
-// void div_gmp(mpz_t a, double b);
 
 void modular_exponentiation(mpz_t r, mpz_t a, mpz_t b, mpz_t N);
+void window_exp(mpz_t r, mpz_t b, mpz_t e, mpz_t rho_sq, mp_limb_t omega, mpz_t N);
 
-void Montgomery_multiplication(mpz_t r, mpz_t a, mpz_t b, mpz_t N);
-
+void mont_multiplication(mpz_t r, mpz_t a, mpz_t b, mp_limb_t omega, mpz_t N);
+void mont_omega(mp_limb_t* omega, mpz_t N);
+void mont_r_sq(mpz_t rho_sq, mpz_t N);
+void mont_number(mpz_t r, mpz_t num, mpz_t rho_sq, mp_limb_t omega, mpz_t N);
+void mont_REDC(mpz_t r, mpz_t t, mp_limb_t omega, mpz_t N);
+int max(int x, int y);
 
 #endif
 

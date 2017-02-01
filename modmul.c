@@ -14,8 +14,8 @@ void stage1() {
   mpz_t N, e, m, c;
   mpz_inits( N, e, m, c, NULL);
   // Montgomery parameters
-  mpz_t rho_sq;
-  mpz_init(rho_sq);
+  mpz_t r_sq;
+  mpz_init(r_sq);
   mp_limb_t omega;
   
   while (!feof(stdin)){
@@ -25,26 +25,26 @@ void stage1() {
     // mpz_powm_sec(c,m,e,N);
 
     // Iteration 2
-    // modular_exponentiation(c,m,e,N);
+    // squaring_exp(c,m,e,N);
     
     // Iteration 3
-    // initialise Montgomery parameters
+    // Initialise Montgomery parameters
     mont_omega(&omega, N);
-    mont_rho_sq(rho_sq, N);
+    mont_r_sq(r_sq, N);
     
     // Convert m to Montgomery number
-    mont_number(m, m, rho_sq, omega, N);
+    mont_number(m, m, r_sq, omega, N);
     
     // Exponentiation: c = m^e
-    window_exp(c, m, e, rho_sq, omega, N);
+    window_exp(c, m, e, r_sq, omega, N);
     
     // Perform Montgomery reduction: c = c mod N
-    mont_reduction(c, c, omega, N);
+    mont_REDC(c, c, omega, N);
     
 
     gmp_printf( "%ZX\n", c);
   }
-  mpz_clear(rho_sq);
+  mpz_clear(r_sq);
   mpz_clears( N, e, m, c, NULL);
 }
 
@@ -62,8 +62,8 @@ void stage2() {
   mpz_inits( N, d, p, q, dP, dQ, iP, iQ, c, m, NULL);
 
   // Montgomery parameters
-  mpz_t rho_sq, mP, mQ, cP, cQ, t;
-  mpz_inits(rho_sq, mP, mQ, cP, cQ, t, NULL);
+  mpz_t r_sq, mP, mQ, cP, cQ, t;
+  mpz_inits(r_sq, mP, mQ, cP, cQ, t, NULL);
   mp_limb_t omega;
   
   while (!feof(stdin)){
@@ -85,18 +85,18 @@ void stage2() {
 
     // Initialise Montgomery parameters p. Compute mP = c^(d mod (p-1) (mod p)
     mont_omega(&omega, p);
-    mont_rho_sq(rho_sq, p);
+    mont_r_sq(r_sq, p);
     mpz_mod(cP, c, p);
-    mont_number(cP, cP, rho_sq, omega, p);
-    window_exp(mP, cP, dP, rho_sq, omega, p);
-    mont_reduction(mP, mP, omega, p);
+    mont_number(cP, cP, r_sq, omega, p);
+    window_exp(mP, cP, dP, r_sq, omega, p);
+    mont_REDC(mP, mP, omega, p);
     // Initialise Montgomery parameters q. Compute mQ = c^(d mod (q-1) (mod q)
     mont_omega(&omega, q);
-    mont_rho_sq(rho_sq, q);
+    mont_r_sq(r_sq, q);
     mpz_mod(cQ, c, q);
-    mont_number(cQ, cQ, rho_sq, omega, q);
-    window_exp(mQ, cQ, dQ, rho_sq, omega, q);
-    mont_reduction(mQ, mQ, omega, q); 
+    mont_number(cQ, cQ, r_sq, omega, q);
+    window_exp(mQ, cQ, dQ, r_sq, omega, q);
+    mont_REDC(mQ, mQ, omega, q); 
     
     // p.t == mQ - mP (mod q)
     mpz_sub(t, mQ, mP);
@@ -104,14 +104,14 @@ void stage2() {
     mpz_mod(t, t, q);
     
     // convert t and iP to Montgomery numbers
-    mont_number(t, t, rho_sq, omega, q);
-    mont_number(iP, iP, rho_sq, omega, q);
+    mont_number(t, t, r_sq, omega, q);
+    mont_number(iP, iP, r_sq, omega, q);
     
     // t = p^(-1).(mQ - mP) (mod q)
     mont_multiplication(t, t, iP, omega, q);
     
     // Perform Montgomery reduction: t = t mod q
-    mont_reduction(t, t, omega, q);
+    mont_REDC(t, t, omega, q);
     
     // m = mP + p*t
     mpz_mul(m, p, t);
@@ -121,7 +121,7 @@ void stage2() {
 
   }
 
-  mpz_clears(rho_sq, mP, mQ, cP, cQ, t, NULL);
+  mpz_clears(r_sq, mP, mQ, cP, cQ, t, NULL);
   mpz_clears( N, d, p, q, dP, dQ, iP, iQ, c, m, NULL);
 }
 
@@ -139,8 +139,8 @@ void stage3(int is_prng) {
   mpz_inits(  p, q, g, h, m, c1, c2, key, NULL);
   
   // mont parameters
-  mpz_t rho_sq;
-  mpz_init(rho_sq);
+  mpz_t r_sq;
+  mpz_init(r_sq);
   mp_limb_t omega;
 
   while (!feof(stdin)){
@@ -159,8 +159,8 @@ void stage3(int is_prng) {
     // mpz_mod(c2,c2,p);
 
     // Iteration 2
-    // modular_exponentiation(c1,g,key,p);
-    // modular_exponentiation(c2,h,key,p);
+    // squaring_exp(c1,g,key,p);
+    // squaring_exp(c2,h,key,p);
     // mpz_mul (c2, m, c2);
     // mpz_mod(c2,c2,p);
 
@@ -171,30 +171,30 @@ void stage3(int is_prng) {
     
     // Initialise Montgomery parameters p.
     mont_omega(&omega, p);
-    mont_rho_sq(rho_sq, p);
+    mont_r_sq(r_sq, p);
     
     // Convert g and h to Montgomery numbers
-    mont_number(g, g, rho_sq, omega, p);
-    mont_number(h, h, rho_sq, omega, p);
+    mont_number(g, g, r_sq, omega, p);
+    mont_number(h, h, r_sq, omega, p);
     
-    // Compute c1 = g^key
-    window_exp(c1, g, key, rho_sq, omega, p);
+    // Compute c1 = g^key mod p
+    window_exp(c1, g, key, r_sq, omega, p);
     
-    // Compute c2 = h^key
-    window_exp(c2, h, key, rho_sq, omega, p);
+    // Compute c2 = h^key mod p
+    window_exp(c2, h, key, r_sq, omega, p);
     
     // Convert c2 to a Montgomery number
-    mont_number(c2, c2, rho_sq, omega, p);
+    mont_number(c2, c2, r_sq, omega, p);
     // Compute c2 = m.c2
     mont_multiplication(c2, c2, m, omega, p);
     
     // Perform Montgomery reduction: ci = ci mod p
-    mont_reduction(c2, c2, omega, p);
-    mont_reduction(c1, c1, omega, p);
+    mont_REDC(c2, c2, omega, p);
+    mont_REDC(c1, c1, omega, p);
 
     gmp_printf("%ZX\n%ZX\n", c1, c2);   
   }
-  mpz_clear(rho_sq);
+  mpz_clear(r_sq);
   mpz_clears(  p, q, g, h, m, c1, c2, key, NULL);
 
 }
@@ -213,8 +213,8 @@ void stage4() {
   mpz_inits(  p, q, g, x, c1, c2, m, NULL);
 
   // Montgomery parameters
-  mpz_t rho_sq;
-  mpz_init(rho_sq);
+  mpz_t r_sq;
+  mpz_init(r_sq);
   mp_limb_t omega;
 
   while (!feof(stdin)){
@@ -226,7 +226,7 @@ void stage4() {
     // mpz_mod(m, c2, p);
     
     // Iteration 2
-    // modular_exponentiation(c1,c1,x,p);
+    // squaring_exp(c1,c1,x,p);
     // mpz_invert (c1, c1, p);
     // mpz_mul (c2, c1, c2);
     // mpz_mod(m, c2, p);
@@ -234,27 +234,27 @@ void stage4() {
 
     // Initialise Montgomery parameters for p
     mont_omega(&omega, p);
-    mont_rho_sq(rho_sq, p);
+    mont_r_sq(r_sq, p);
     
     // Convert c1 and c2 to Montgomery numbers
-    mont_number(c1, c1, rho_sq, omega, p);
-    mont_number(c2, c2, rho_sq, omega, p);
+    mont_number(c1, c1, r_sq, omega, p);
+    mont_number(c2, c2, r_sq, omega, p);
     
     // -x = q - x
     mpz_sub(x, q, x);
     
     // compute c1^(-x)
-    window_exp(c1, c1, x, rho_sq, omega, p);
+    window_exp(c1, c1, x, r_sq, omega, p);
     
     // c2 = c1.c2 
     mont_multiplication(c2, c2, c1, omega, p);
     
     // Perform Montgomery reduction
-    mont_reduction(m, c2, omega, p);
+    mont_REDC(m, c2, omega, p);
 
     gmp_printf( "%ZX\n", m);
   }
-  mpz_clear(rho_sq);
+  mpz_clear(r_sq);
   mpz_clears(  p, q, g, x, c1, c2, m, NULL);
 
 }

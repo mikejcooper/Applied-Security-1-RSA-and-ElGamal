@@ -16,9 +16,8 @@ int prng_index = 0;
 void fill_prng_array() {
 	FILE *fp;
 	uint8_t input[prng_bit_length/8];
-	// /dev/urandom returns random numbers based on /dev/random
 	for (int i = 0; i < 100; i++){
-		fp = fopen("/dev/urandom", "r");
+		fp = fopen("/dev/urandom", "r"); 	// dev/urandom returns random numbers based on /dev/random
 		fread(&input, 1, sizeof(input), fp);
 		mpz_init(prng_values[i]);
 		mpz_import(prng_values[i], sizeof(input), 1, sizeof(input[0]), 0, 0, input);
