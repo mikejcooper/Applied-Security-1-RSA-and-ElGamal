@@ -1,0 +1,97 @@
+-------------------------------------------------------------------------------
+
+1. Instructions
+
+- replace any [...] with free text,
+  and
+- replace the [?] with an X if you have completed that stage,
+- replace the [?] with an * if you have attempted that stage, but you know
+  it doesn't work completely; document why you think it doesn't work, plus
+  what you would do to fix the problem, at the end of the marksheet.
+
+-------------------------------------------------------------------------------
+
+2. Information
+
+So that we can calibrate and improve the assignment in the future, give us
+a rough idea how long (in hours) you spent on it *in total*:
+
+effort : [28] hours
+
+-------------------------------------------------------------------------------
+
+3. Citation
+
+Clearly it might have an influence on your mark, but the use of third-party
+resources *is* allowed *if* correctly cited (unless explicitly prohibited 
+by the assignment description of course).  Let us know what third-party 
+source code or resources you used (if any) so it's clear what's your work 
+and what isn't:
+
+[
+	For the Sliding window implementation, I followed the Sliding Window Exponentiation - Algorithm Pseudo-code from wikipedia.
+	For the Montgomery Multiplication and Reduction I followed partially from the slides and partially from wikipedia.
+]
+
+-------------------------------------------------------------------------------
+
+4. Marking
+
+The following gives a stage-by-stage description of the assignment marking
+scheme.  Note this acts as an indicative guideline only, including weights
+for each more obvious aspect (e.g., functional correctness); other aspects
+outside this list can warrant an increase/decrease in marks, with examples
+including hard to quantify features such as the efficiency, robustness, 
+generality, realism, or style of a solution.
+
+[X] Stage 1 : implement RSA     encryption                           ( 10%)
+
+[X] Stage 2 : implement RSA     decryption                           ( 10%)
+
+[X] Stage 3 : implement ElGamal encryption                           ( 10%)
+
+[X] Stage 4 : implement ElGamal decryption                           ( 10%)
+
+    Extra   : implement (and integrate) major optimisations
+[X]           - has a reasoned approach to pseudo-random generation  ( 10%)
+[X]           - uses Chinese Remainder Theorem (CRT)                 ( 10%)
+[X]           - uses non-binary (i.e., "windowed") exponentiation    ( 15%)
+[X]           - uses Montgomery multiplication wherever appropriate  ( 25%)
+
+                                                                     ------
+                                                                     (100%)
+
+-------------------------------------------------------------------------------
+
+5. Documentation
+
+Any other documentation, notes or comments that you think are important or
+might be easy to overlook (e.g., a subtle issue or technique in associated
+source code) should go here:
+
+[
+	Stage 1-4: 
+	All tests pass on input format provided in assignment documentation. 
+	- To see code for this stage only: "// Iteration 1" in each function in modmul.c
+
+
+	Optomisation: 
+	a) To generate the ephemeral key, I used the gmp gmp_randinit_default function which creates an initial state for the Mersenne Twister algorithm. I then generate a 160-bit random seed (SHA1 equivalent), the size of the seed is important as it determines how many different sequences of random numbers that its possible to generate (2^160). To do this I read bytes of information from the \'91/dev/urandom\'92 directory - this appears to be one of the only way to obtain a approximate representation of randomness (pseudo-random generation). It could be argued that each value has close to 160 bits of entropy. 
+	I store an array of 160 bit random values, which can potentially be more efficient (less reading from  '/dev/urandom\' directory) if many messages need encoding before exiting the program. 
+
+	- To run stage 3 with the PRNG run:$ ./modmul PRNGstage3 < ${INPUT} > ${OUTPUT}
+
+	b) CRT has been implemented in crt.c
+	- To see code for this stage only: "// Iteration 2" in each function in modmul.c
+
+	c) Modular expontiation in Exponentiation.c:
+		Two types: 
+			1. Binary exponentiation ( I know the assigment said non-binary but this was a stepping point to the windowed approach ) : int exp_by_squaring_iterative()
+			2. Sliding window method, window size of 4 (fastest size, there will be a specific space/time trade off on lab machine) 
+
+	d) All Montgomery functions are in Montgomery.c
+	   - I use mpz_swap where possible as it is O(1), while mpz_set is O(n) where n is the number of limbs.
+	   - To see code for this c) & d) only: "// Iteration 3" in each function in modmul.c
+]
+
+-------------------------------------------------------------------------------

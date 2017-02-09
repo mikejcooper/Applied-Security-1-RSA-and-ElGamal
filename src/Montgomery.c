@@ -76,14 +76,6 @@ void mont_r_sq(mpz_t r_sq, mpz_t N) {
 }
 
 /*
-    Convert to Montgomery number r, where r < N
-*/
-void mont_number(mpz_t r, mpz_t num, mpz_t r_sq, mp_limb_t omega, mpz_t N) {
-    // r = num * rho (mod N)
-    mont_multiplication(r, num, r_sq, omega, N);
-}
-
-/*
   Montgomery reduction
   b = mp_bits_per_limb
      Montgomery reduction, also known as REDC, is an algorithm that simultaneously computes 
@@ -116,6 +108,13 @@ void mont_REDC(mpz_t rop, mpz_t t, mp_limb_t omega, mpz_t N) {
     mpz_clears(r, bN, NULL);
 }
 
+/*
+    Convert to Montgomery number r, where r < N
+*/
+void mont_number(mpz_t r, mpz_t num, mpz_t r_sq, mp_limb_t omega, mpz_t N) {
+    // r = num * rho mod N
+    mont_multiplication(r, num, r_sq, omega, N);
+}
 
 
 /* 

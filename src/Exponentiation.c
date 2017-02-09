@@ -80,8 +80,8 @@ void window_exp(mpz_t r, mpz_t b, mpz_t e, mpz_t rho_sq, mp_limb_t omega, mpz_t 
     mpz_t table[m/2], b_sq;
     
     /* -------------- PREPROCESSING: The m-ary Method --------------
-        Compute: b^2 = b^1 * b^1, | b^4 = b^2 * b^2, b^8 = b^4 * B^2, b^16 = b^8 * b^2  .... and so on |
-                                  | b^4.i = b^2.i * b^2                                                |
+        Compute: b^2 = b^1 * b^1, | b^3 = b^2 * b^1, b^5 = b^3 * b^2, b^7 = b^5 * b^2  .... and so on |
+                                  | b^i = b^(i-2) * b^2 , where i = 3,5,7,...2^d -1                   |
                                     Store values in lookup table. 
     */
     mpz_init(table[0]);
@@ -107,6 +107,7 @@ void window_exp(mpz_t r, mpz_t b, mpz_t e, mpz_t rho_sq, mp_limb_t omega, mpz_t 
         // Traverse through leading zeros
         if (get_bits(e, i, i) == 0) {
             i--;
+            // r = r^2
             mont_multiplication(r, r, r, omega, N);
         } 
         else {
@@ -115,9 +116,11 @@ void window_exp(mpz_t r, mpz_t b, mpz_t e, mpz_t rho_sq, mp_limb_t omega, mpz_t 
                 s++;
 
             for(int h = 0; h < i - s + 1; h++) {
+                // r = r^2
                 mont_multiplication(r, r, r, omega, N);
             }
             int u = get_bits(e, i, s);
+            // r = r * Xu 
             mont_multiplication(r, r, table[(u - 1) / 2], omega, N);
             i = s - 1;  
         } 
