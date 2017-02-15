@@ -1,6 +1,5 @@
 #include "modmul.h"
 
-
 /*
 Perform stage 1:
 
@@ -12,13 +11,13 @@ Perform stage 1:
 void stage1() {
   // Stdin parameters
   mpz_t N, e, m, c;
-  mpz_inits( N, e, m, c, NULL);
+  mpz_init(N); mpz_init(e); mpz_init(m); mpz_init(c); 
   // Montgomery parameters
   mpz_t r_sq;
   mpz_init(r_sq);
   mp_limb_t omega;
   
-  while (!feof(stdin)){
+  while (!feof(stdin)) {
     gmp_scanf("%Zx\n%Zx\n%Zx", N, e, m);
 
     // Iteration 1
@@ -44,8 +43,7 @@ void stage1() {
 
     gmp_printf( "%ZX\n", c);
   }
-  mpz_clear(r_sq);
-  mpz_clears( N, e, m, c, NULL);
+  mpz_clear(r_sq); mpz_clear(N); mpz_clear(e); mpz_clear(m); mpz_clear(c); 
 }
 
 /*
@@ -59,11 +57,12 @@ Perform stage 2:
 void stage2() {
   // Stdin parameters
   mpz_t N, d, p, q, dP, dQ, iP, iQ, c, m;
-  mpz_inits( N, d, p, q, dP, dQ, iP, iQ, c, m, NULL);
+  mpz_init(N); mpz_init(d); mpz_init(p); mpz_init(q); mpz_init(dP); 
+  mpz_init(dQ); mpz_init(iP); mpz_init(iQ); mpz_init(c); mpz_init(m); 
 
   // Montgomery parameters
   mpz_t r_sq, mP, mQ, cP, cQ, t;
-  mpz_inits(r_sq, mP, mQ, cP, cQ, t, NULL);
+  mpz_init(r_sq); mpz_init(mP); mpz_init(mQ); mpz_init(cP); mpz_init(cQ); mpz_init(t); 
   mp_limb_t omega;
   
   while (!feof(stdin)){
@@ -121,8 +120,9 @@ void stage2() {
 
   }
 
-  mpz_clears(r_sq, mP, mQ, cP, cQ, t, NULL);
-  mpz_clears( N, d, p, q, dP, dQ, iP, iQ, c, m, NULL);
+  mpz_clear(N); mpz_clear(d); mpz_clear(p); mpz_clear(q); mpz_clear(dP); 
+  mpz_clear(dQ); mpz_clear(iP); mpz_clear(iQ); mpz_clear(c); mpz_clear(m); 
+  mpz_clear(r_sq); mpz_clear(mP); mpz_clear(mQ); mpz_clear(cP); mpz_clear(cQ); mpz_clear(t); 
 }
 
 /*
@@ -136,7 +136,7 @@ Perform stage 3:
 void stage3(int is_prng) {
 
   mpz_t p, q, g, h, m, c1, c2, key;
-  mpz_inits(  p, q, g, h, m, c1, c2, key, NULL);
+  mpz_init(p); mpz_init(q); mpz_init(g); mpz_init(h); mpz_init(m); mpz_init(c1); mpz_init(c2); mpz_init(key); 
   
   // Montgomery parameters
   mpz_t r_sq;
@@ -195,8 +195,9 @@ void stage3(int is_prng) {
 
     gmp_printf("%ZX\n%ZX\n", c1, c2);   
   }
-  mpz_clear(r_sq);
-  mpz_clears(  p, q, g, h, m, c1, c2, key, NULL);
+
+  mpz_clear(r_sq); mpz_clear(p); mpz_clear(q); mpz_clear(g); mpz_clear(h); mpz_clear(m); mpz_clear(c1); mpz_clear(c2); mpz_clear(key); 
+
 
 }
 
@@ -211,7 +212,7 @@ Perform stage 4:
 void stage4() {
 
   mpz_t p, q, g, x, c1, c2, m;
-  mpz_inits(  p, q, g, x, c1, c2, m, NULL);
+  mpz_init(p); mpz_init(q); mpz_init(g); mpz_init(x); mpz_init(c1); mpz_init(c2); mpz_init(m); 
 
   // Montgomery parameters
   mpz_t r_sq;
@@ -256,9 +257,8 @@ void stage4() {
 
     gmp_printf( "%ZX\n", m);
   }
-  mpz_clear(r_sq);
-  mpz_clears(  p, q, g, x, c1, c2, m, NULL);
 
+  mpz_clear(r_sq); mpz_clear(p); mpz_clear(q); mpz_clear(g); mpz_clear(x); mpz_clear(c1); mpz_clear(c2); mpz_clear(m); 
 }
 
 /*
@@ -275,11 +275,11 @@ int main( int argc, char* argv[] ) {
   else if( !strcmp( argv[ 1 ], "stage2" ) ) {
     stage2();
   }
-  else if( !strcmp( argv[ 1 ], "PRNGstage3" )) {
-    stage3(1);
+  else if( !strcmp( argv[ 1 ], "NOPRNGstage3" )) {
+    stage3(0);
   }
   else if( !strcmp( argv[ 1 ], "stage3" ) ) {
-    stage3(0);
+    stage3(1);
   }
   else if( !strcmp( argv[ 1 ], "stage4" ) ) {
     stage4();

@@ -86,7 +86,7 @@ void mont_r_sq(mpz_t r_sq, mpz_t N) {
 void mont_REDC(mpz_t rop, mpz_t t, mp_limb_t omega, mpz_t N) {
     mpz_t r, bN;     // Using temp t therefore r and x can be passed as same variable (adkin to GMP functions)
     mp_limb_t u, r_i;
-    mpz_inits(r,bN, NULL);
+    mpz_init(r); mpz_init(bN);
     mpz_set(r, t);
     
     for (mp_size_t i = 0; i < mpz_size(N); i++) {
@@ -105,7 +105,7 @@ void mont_REDC(mpz_t rop, mpz_t t, mp_limb_t omega, mpz_t N) {
         mpz_sub(r,r,N);
     
     mpz_swap(rop, r); 
-    mpz_clears(r, bN, NULL);
+    mpz_clear(r); mpz_clear(bN);
 }
 
 /*

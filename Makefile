@@ -1,6 +1,4 @@
-SRCDIR   = src
-
-modmul : $(wildcard $(SRCDIR)/*.[ch])
+modmul : $(wildcard *.[ch])
 	@gcc -Wall -std=gnu99 -O3 -o ${@} $(filter %.c, ${^}) -lgmp
 
 .DEFAULT_GOAL = all

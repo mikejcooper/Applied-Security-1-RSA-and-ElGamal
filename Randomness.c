@@ -1,5 +1,7 @@
 #include "modmul.h"
 #include <math.h>
+#include <stdint.h>
+
 #define r_bit_length 160 // SHA-1 security standard
 #define random_values 100
 

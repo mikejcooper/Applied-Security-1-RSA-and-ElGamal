@@ -12,7 +12,7 @@ Extension c - Non-Binary (i.e., "windowed") Exponentiation
 
 int exp_by_squaring_iterative(mpz_t b, mpz_t e, mpz_t N){
 	mpz_t tmp, y;
-	mpz_inits(tmp,y, NULL);
+	mpz_init(tmp); mpz_init(y);
 	if(mpz_cmp_si(e,0) == -1){
 		mpz_set_ui(tmp,1);
 		mpz_invert(b,b,tmp);
@@ -42,7 +42,7 @@ int exp_by_squaring_iterative(mpz_t b, mpz_t e, mpz_t N){
 		}
 	}
 	mpz_mul(b,b,y);
-	mpz_clears(tmp,y, NULL);
+    mpz_clear(tmp); mpz_clear(y);
 	return 1;
 }
 

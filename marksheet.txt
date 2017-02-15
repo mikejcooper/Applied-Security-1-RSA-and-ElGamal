@@ -79,7 +79,8 @@ source code) should go here:
 	a) To generate the ephemeral key, I used the gmp gmp_randinit_default function which creates an initial state for the Mersenne Twister algorithm. I then generate a 160-bit random seed (SHA1 equivalent), the size of the seed is important as it determines how many different sequences of random numbers that its possible to generate (2^160). To do this I read bytes of information from the \'91/dev/urandom\'92 directory - this appears to be one of the only way to obtain a approximate representation of randomness (pseudo-random generation). It could be argued that each value has close to 160 bits of entropy. 
 	I store an array of 160 bit random values, which can potentially be more efficient (less reading from  '/dev/urandom\' directory) if many messages need encoding before exiting the program. 
 
-	- To run stage 3 with the PRNG run:$ ./modmul PRNGstage3 < ${INPUT} > ${OUTPUT}
+	- To run stage 3 with the wihtout PRNG run:$ ./modmul NOPRNGstage3 < ${INPUT} > ${OUTPUT}
+	- This will pass the test for stage3 from the given stage3.input and stage3.output
 
 	b) CRT has been implemented in crt.c
 	- To see code for this stage only: "// Iteration 2" in each function in modmul.c

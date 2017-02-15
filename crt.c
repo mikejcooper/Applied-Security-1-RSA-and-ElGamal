@@ -25,7 +25,8 @@ This works becuase,
 void crt(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t iP, mpz_t iQ, mpz_t c, mpz_t m){
 
 	mpz_t a , b, s, f, h, i;
-	mpz_inits(a, b, s, f, h, i, NULL);
+    mpz_init(a); mpz_init(b); mpz_init(s); mpz_init(f); mpz_init(h); mpz_init(i); 
+
 	/* 
 	Precomputed:
 		dP = d mod p-1
@@ -34,8 +35,8 @@ void crt(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t iP, mpz_t
 		a == c^dP mod p
 		b == c^dQ mod q
 	*/
-	mpz_powm_sec(a, c, dP, p);
-	mpz_powm_sec(b, c, dQ, q);
+	mpz_powm(a, c, dP, p);
+	mpz_powm(b, c, dQ, q);
 	/*
 	Precomputed: 
 		qi = q^-1 mod p
@@ -55,7 +56,8 @@ void crt(mpz_t N, mpz_t d, mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t iP, mpz_t
 	mpz_mul(i, h, q);
 	mpz_add(m, b, i);
 
-	mpz_clears(a, b, s, f, h, i, NULL);
+	mpz_clear(a); mpz_clear(b); mpz_clear(s); mpz_clear(f); mpz_clear(h); mpz_clear(i); 
+
 }
 
 /* 
